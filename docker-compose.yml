@@ -1,0 +1,23 @@
+# 家庭点菜系统 · Docker Compose 编排
+# 可直接用于 1Panel 的“编排 / Docker Compose”应用创建
+services:
+  family-meal:
+    build: .
+    image: family-meal:latest
+    container_name: family-meal
+    restart: always
+    # 对外端口：冒号左侧为宿主机端口（可改，如 8080:3000），右侧为容器内端口（固定 3000，勿改）
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATA_DIR=/data
+      - UPLOAD_DIR=/data/uploads
+      # 首次启动自动创建的管理员账号（部署后请登录并尽快修改密码）
+      - ADMIN_USER=admin
+      - ADMIN_PASS=admin123
+      # 是否开放注册，false 则只能由管理员在后台新建用户
+      - ALLOW_REGISTER=true
+    volumes:
+      # SQLite 数据库与上传图片保存在宿主机 ./data 目录，升级/重建容器数据不丢失
+      - ./data:/data
