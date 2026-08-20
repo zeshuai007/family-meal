@@ -1,0 +1,16 @@
+{
+  "name": "family-meal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --check app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://localhost:26831/zeshuai007/family-meal"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8f3" />
+    <title>一日三餐 · 家庭点菜</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#home" aria-label="返回首页">
+          <span class="brand-mark">家</span>
+          <span><strong>一日三餐</strong><small>family table</small></span>
+        </a>
+        <nav class="desktop-nav" aria-label="主导航">
+          <button class="nav-link active" data-view="home">今日点菜</button>
+          <button class="nav-link" data-view="menu">家庭菜单</button>
+          <button class="nav-link" data-view="records">点菜记录</button>
+          <button class="nav-link" data-view="admin">管理菜单</button>
+        </nav>
+        <div class="header-actions">
+          <button class="icon-btn" id="notificationBtn" aria-label="查看提醒">♧<i></i></button>
+          <button class="profile" id="profileBtn"><span class="avatar">孕</span><span class="profile-name">小雅</span><span class="chevron">⌄</span></button>
+        </div>
+      </header>
+
+      <main>
+        <section class="view active" id="homeView">
+          <div class="hero">
+            <div>
+              <p class="eyebrow">THURSDAY · 08.20</p>
+              <h1>今天想吃点什么？<br /><em>让家里的味道，按你的心意来。</em></h1>
+              <p class="hero-copy">婆婆已经准备好新鲜食材，选好三餐后，厨房会收到你的菜单。</p>
+            </div>
+            <div class="hero-art"><span>今日宜</span><strong>好好吃饭</strong><small>♡ 也要好好爱自己</small></div>
+          </div>
+
+          <div class="section-heading"><div><p class="eyebrow">MENU FOR TODAY</p><h2>今日菜单</h2></div><button class="text-btn" data-view="menu">查看全部 <span>→</span></button></div>
+          <div class="meal-tabs" role="tablist">
+            <button class="meal-tab active" data-meal="breakfast"><span>早餐</span><small>08:00 前</small></button>
+            <button class="meal-tab" data-meal="lunch"><span>午餐</span><small>12:00 前</small></button>
+            <button class="meal-tab" data-meal="dinner"><span>晚餐</span><small>18:00 前</small></button>
+          </div>
+          <div id="mealCards" class="meal-cards"></div>
+          <section class="today-note"><span class="note-icon">✦</span><div><strong>给准妈妈的小提醒</strong><p>今天的菜单里有丰富的蛋白质和蔬菜，记得少食多餐，保持好心情。</p></div><span class="note-flower">✿</span></section>
+        </section>
+
+        <section class="view" id="menuView">
+          <div class="page-title"><div><p class="eyebrow">THE FAMILY RECIPE BOOK</p><h1>家庭菜单</h1><p>每一道菜，都是厨房里值得被记住的味道。</p></div><button class="primary-btn" id="openAddDish">＋ 添加新菜</button></div>
+          <div class="filter-row"><div class="search"><span>⌕</span><input id="searchInput" placeholder="搜索菜名或食材..." /></div><div class="chips"><button class="chip active" data-category="全部">全部</button><button class="chip" data-category="荤菜">荤菜</button><button class="chip" data-category="素菜">素菜</button><button class="chip" data-category="汤羹">汤羹</button><button class="chip" data-category="主食">主食</button></div></div>
+          <div id="allDishes" class="dish-grid"></div>
+        </section>
+
+        <section class="view" id="recordsView">
+          <div class="page-title"><div><p class="eyebrow">OUR LITTLE MOMENTS</p><h1>点菜记录</h1><p>把每天的好好吃饭，认真记录下来。</p></div></div>
+          <div class="record-summary"><div><span>本周已点</span><strong id="weekCount">0</strong><small>道菜</small></div><div><span>最常点</span><strong id="favoriteDish">—</strong><small>下次还想吃</small></div><div><span>家庭评分</span><strong>4.9</strong><small>来自 28 次点评</small></div></div>
+          <div id="recordsList" class="records-list"></div>
+        </section>
+
+        <section class="view" id="adminView">
+          <div class="page-title"><div><p class="eyebrow">KITCHEN CONTROL</p><h1>菜单管理</h1><p>只有获得授权的家人，才可以更新这本家庭菜谱。</p></div><button class="primary-btn" id="openAddDishAdmin">＋ 添加新菜</button></div>
+          <div class="admin-banner"><span class="admin-shield">✓</span><div><strong>管理员模式已开启</strong><p>当前登录：小雅 · 管理员权限</p></div><button class="text-btn">权限设置 →</button></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>菜品</th><th>分类</th><th>状态</th><th>更新日期</th><th></th></tr></thead><tbody id="adminTable"></tbody></table></div>
+        </section>
+      </main>
+      <nav class="mobile-nav"><button class="active" data-view="home"><span>⌂</span>今日</button><button data-view="menu"><span>♨</span>菜单</button><button data-view="records"><span>♡</span>记录</button><button data-view="admin"><span>⚙</span>管理</button></nav>
+    </div>
+
+    <div class="modal-backdrop" id="dishModal"><div class="modal"><button class="modal-close" data-close>×</button><p class="eyebrow">ADD TO RECIPE BOOK</p><h2>添加一道家常菜</h2><form id="dishForm"><label>菜品名称<input required name="name" placeholder="例如：番茄牛腩" /></label><label>菜品分类<select name="category"><option>荤菜</option><option>素菜</option><option>汤羹</option><option>主食</option></select></label><label>主食材与配料<input required name="ingredients" placeholder="牛腩、番茄、洋葱..." /></label><label>详细做法<textarea required name="method" rows="3" placeholder="写下婆婆的拿手做法..."></textarea></label><label>菜品图片<input name="image" type="file" accept="image/*" /></label><button class="primary-btn full" type="submit">保存到家庭菜单</button></form></div></div>
+    <div class="toast" id="toast"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
