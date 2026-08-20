@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import mealPlaceholder from './assets/meal-placeholder.svg'
 import './styles.css'
@@ -723,7 +723,7 @@ function App() {
         />
       )}
       {toast && (
-        <div className={`toast toast-${toast.type}`} role="status">
+        <div className={`toast toast-${toast.type}`} role={toast.type === 'warning' ? 'alert' : 'status'}>
           <span className="toast-icon"><Icon name={toast.type === 'warning' ? 'bell' : 'check'} size={16} /></span>
           {toast.message}
         </div>
@@ -808,7 +808,7 @@ function MobileNav({ navItems, view, goTo }) {
 
 function Dashboard({ activeMenu, todayPlan, onConfirm, onChooseMeal, onOpenDish, onGoTo, onReview, user }) {
   const selectedCount = meals.filter((meal) => todayPlan[meal]).length
-  const recommended = activeMenu.filter((dish) => !dish.favorite).slice(0, 3)
+  const recommended = [...activeMenu].sort((first, second) => second.rating - first.rating).slice(0, 3)
   return (
     <div className="view-stack">
       <section className="welcome-row">
@@ -875,7 +875,7 @@ function Dashboard({ activeMenu, todayPlan, onConfirm, onChooseMeal, onOpenDish,
       <section className="split-section">
         <div className="section-block recommendation-block">
           <div className="section-heading">
-            <div><p className="eyebrow">MAYBE YOU LIKE</p><h2>婆婆的新菜</h2></div>
+            <div><p className="eyebrow">MAYBE YOU LIKE</p><h2>婆婆的推荐</h2></div>
             <button className="text-button muted" onClick={() => onGoTo('menu')} type="button">查看全部 <Icon name="arrow" size={15} /></button>
           </div>
           <div className="mini-dish-list">
@@ -1055,7 +1055,8 @@ function EmptyState({ title, description, action, onAction }) {
 }
 
 function Modal({ eyebrow, title, onClose, children, wide = false }) {
-  return <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}><section aria-modal="true" className={`modal ${wide ? 'modal-wide' : ''}`} role="dialog"><div className="modal-header"><div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div><IconButton label="关闭" name="close" onClick={onClose} /></div>{children}</section></div>
+  const titleId = useId()
+  return <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}><section aria-labelledby={titleId} aria-modal="true" className={`modal ${wide ? 'modal-wide' : ''}`} role="dialog"><div className="modal-header"><div><p className="eyebrow">{eyebrow}</p><h2 id={titleId}>{title}</h2></div><IconButton label="关闭" name="close" onClick={onClose} /></div>{children}</section></div>
 }
 
 function DishPickerModal({ meal, menu, selectedId, onClose, onChoose, onOpenDish }) {
