@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import mealPlaceholder from './assets/meal-placeholder.svg'
 import './styles.css'
 
 const storageKey = 'family-meal-store-v1'
@@ -445,8 +446,8 @@ function App() {
   }, [store])
 
   useEffect(() => {
-    if (view === 'admin' && !store.isAdmin) setView('home')
-  }, [store.isAdmin, view])
+    if (!store.isAdmin) setView((currentView) => (currentView === 'admin' ? 'home' : currentView))
+  }, [store.isAdmin])
 
   useEffect(() => {
     if (!toast) return undefined
@@ -967,6 +968,7 @@ function DishCard({ dish, onOpen, onChoose, onFavorite, todayPlan }) {
 function OrdersView({ menu, todayPlan, history, onChooseMeal, onConfirm, onReview, onOpenDish }) {
   const selectedCount = meals.filter((meal) => todayPlan[meal]).length
   const findDish = (id) => menu.find((dish) => dish.id === id)
+  const reviewTarget = findDish(todayPlan.午餐) || findDish(todayPlan.晚餐) || findDish(todayPlan.早餐)
   return (
     <div className="view-stack">
       <section className="page-heading-row">
@@ -981,7 +983,7 @@ function OrdersView({ menu, todayPlan, history, onChooseMeal, onConfirm, onRevie
             return <div className="order-row" key={meal}><div className={`timeline-dot dot-${index + 1}`}><Icon name={index === 0 ? 'sunrise' : index === 1 ? 'sun' : 'moon'} size={15} /></div><div className="order-meal-label"><strong>{meal}</strong><small>{['07:30 早餐时间', '11:30 午餐时间', '17:30 晚餐时间'][index]}</small></div>{dish ? <button className="order-dish" onClick={() => onOpenDish(dish)} type="button"><img alt={dish.name} src={dish.image} /><span><strong>{dish.name}</strong><small>{dish.tags.join(' · ')}</small></span><Icon name="chevron" size={15} /></button> : <button className="order-empty" onClick={() => onChooseMeal(meal)} type="button"><Icon name="plus" size={15} /> 还没有选菜，去菜单看看</button>}<button className="order-edit" onClick={() => onChooseMeal(meal)} type="button">{dish ? '更换' : '选择'}</button></div>
           })}
         </div>
-        <div className="order-overview-footer"><span><Icon name="heart" size={15} /> 已选择 {selectedCount} 道菜，婆婆会按你的口味准备</span><button className="text-button" onClick={() => onReview(findDish(todayPlan.午餐) || findDish(todayPlan.晚餐) || findDish(todayPlan.早餐))} type="button">写下今天的点评 <Icon name="arrow" size={15} /></button></div>
+        <div className="order-overview-footer"><span><Icon name="heart" size={15} /> 已选择 {selectedCount} 道菜，婆婆会按你的口味准备</span><button className="text-button" disabled={!reviewTarget} onClick={() => onReview(reviewTarget)} type="button">写下今天的点评 <Icon name="arrow" size={15} /></button></div>
       </section>
       <section className="history-section"><div className="section-heading"><div><p className="eyebrow">ORDER HISTORY</p><h2>过往点菜</h2></div><button className="filter-small" type="button">最近 7 天 <Icon name="chevron" size={14} /></button></div><div className="history-list">{history.length ? history.map((record) => <HistoryRow findDish={findDish} key={record.date} record={record} />) : <EmptyState title="还没有点菜记录" description="从今天开始，记录每一顿喜欢的饭。" />}</div></section>
     </div>
@@ -995,6 +997,7 @@ function HistoryRow({ record, findDish }) {
 
 function ReviewsView({ reviews, menu, onReview }) {
   const findDish = (id) => menu.find((dish) => dish.id === id)
+  const firstDish = menu.find((dish) => dish.status === '上架')
   return (
     <div className="view-stack">
       <section className="page-heading-row">
@@ -1003,7 +1006,7 @@ function ReviewsView({ reviews, menu, onReview }) {
       </section>
       <section className="review-hero"><div><span className="hero-kicker"><Icon name="heart" size={15} /> FAMILY LOVE</span><h2>把饭桌上的<br /><em>幸福分享出来。</em></h2><p>上传婆婆做好的成品图，让每一次用心都被看见。</p></div><div className="review-hero-art"><span>好吃<br />就要说出来</span><strong>♡</strong></div></section>
       <section className="reviews-section"><div className="section-heading"><div><p className="eyebrow">RECENT REVIEWS</p><h2>最近的点评</h2></div><span className="review-count">{reviews.length} 条记录</span></div><div className="review-grid">{reviews.map((review) => <ReviewCard dish={findDish(review.dishId)} key={review.id} review={review} />)}</div></section>
-      <section className="write-review-card"><div className="write-review-icon"><Icon name="image" size={22} /></div><div><h3>刚吃完一道喜欢的菜？</h3><p>给婆婆留句话，也可以上传今天的成品图。</p></div><button className="button button-outline" onClick={() => onReview(menu.find((dish) => dish.status === '上架'))} type="button">去点评 <Icon name="arrow" size={15} /></button></section>
+      <section className="write-review-card"><div className="write-review-icon"><Icon name="image" size={22} /></div><div><h3>刚吃完一道喜欢的菜？</h3><p>给婆婆留句话，也可以上传今天的成品图。</p></div><button className="button button-outline" disabled={!firstDish} onClick={() => onReview(firstDish)} type="button">去点评 <Icon name="arrow" size={15} /></button></section>
     </div>
   )
 }
@@ -1119,7 +1122,7 @@ function DishFormModal({ dish, onClose, onSave }) {
       sideIngredients: form.sideIngredients.split('\n').map((item) => item.trim()).filter(Boolean),
       seasonings: form.seasonings.split('\n').map((item) => item.trim()).filter(Boolean),
       steps: form.steps.split('\n').map((item) => item.trim()).filter(Boolean),
-      image: form.image.trim() || 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=82',
+      image: form.image.trim() || mealPlaceholder,
       status: dish?.status || '上架',
     })
   }
