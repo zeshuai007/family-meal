@@ -4,6 +4,7 @@ import mealPlaceholder from './assets/meal-placeholder.svg'
 import './styles.css'
 
 const storageKey = 'family-meal-store-v1'
+const maxReviewImageBytes = 700 * 1024
 const meals = ['早餐', '午餐', '晚餐']
 const categories = ['全部', '荤菜', '素菜', '汤品', '主食', '早餐']
 const weekDays = ['日', '一', '二', '三', '四', '五', '六']
@@ -442,7 +443,11 @@ function App() {
   }, [activeMenu, menuFilter, menuSearch])
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(store))
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(store))
+    } catch {
+      setToast((currentToast) => currentToast || { message: '本地空间不足，已保留当前页面内容，请减少成品图数量', type: 'warning' })
+    }
   }, [store])
 
   useEffect(() => {
@@ -1079,8 +1084,8 @@ function ReviewModal({ dish, onClose, onSave }) {
   const handleFile = (event) => {
     const file = event.target.files?.[0]
     if (!file) return
-    if (file.size > 1.5 * 1024 * 1024) {
-      setError('图片请控制在 1.5MB 以内')
+    if (file.size > maxReviewImageBytes) {
+      setError('图片请控制在 700KB 以内')
       return
     }
     const reader = new FileReader()
@@ -1090,7 +1095,7 @@ function ReviewModal({ dish, onClose, onSave }) {
     }
     reader.readAsDataURL(file)
   }
-  return <Modal eyebrow="SHARE YOUR TABLE" title={`点评「${dish.name}」`} onClose={onClose}><div className="review-form"><div className="review-dish-preview"><img alt={dish.name} src={dish.image} /><span><strong>{dish.name}</strong><small>{dish.category} · {dish.tags.join(' · ')}</small></span></div><label className="form-label">这道菜打几分？<StarRating interactive value={rating} onChange={setRating} /></label><label className="form-label">说说你的感受<textarea onChange={(event) => setComment(event.target.value)} placeholder="比如：汤很鲜，牛腩炖得很软……" rows="4" value={comment} /></label><label className="upload-zone">{image ? <img alt="待上传的成品预览" src={image} /> : <><span className="upload-icon"><Icon name="upload" size={21} /></span><strong>上传婆婆做好的成品图</strong><small>支持 JPG、PNG，最大 1.5MB</small></>}<input accept="image/png,image/jpeg,image/webp" onChange={handleFile} type="file" />{image && <span className="upload-again">重新选择图片</span>}</label>{error && <p className="form-error">{error}</p>}<div className="modal-footer"><button className="text-button muted" onClick={onClose} type="button">取消</button><button className="button button-primary" disabled={!comment.trim()} onClick={() => onSave({ dishId: dish.id, rating, comment: comment.trim(), image })} type="button">发布点评 <Icon name="arrow" size={15} /></button></div></div></Modal>
+  return <Modal eyebrow="SHARE YOUR TABLE" title={`点评「${dish.name}」`} onClose={onClose}><div className="review-form"><div className="review-dish-preview"><img alt={dish.name} src={dish.image} /><span><strong>{dish.name}</strong><small>{dish.category} · {dish.tags.join(' · ')}</small></span></div><label className="form-label">这道菜打几分？<StarRating interactive value={rating} onChange={setRating} /></label><label className="form-label">说说你的感受<textarea onChange={(event) => setComment(event.target.value)} placeholder="比如：汤很鲜，牛腩炖得很软……" rows="4" value={comment} /></label><label className="upload-zone">{image ? <img alt="待上传的成品预览" src={image} /> : <><span className="upload-icon"><Icon name="upload" size={21} /></span><strong>上传婆婆做好的成品图</strong><small>支持 JPG、PNG，最大 700KB</small></>}<input accept="image/png,image/jpeg,image/webp" onChange={handleFile} type="file" />{image && <span className="upload-again">重新选择图片</span>}</label>{error && <p className="form-error">{error}</p>}<div className="modal-footer"><button className="text-button muted" onClick={onClose} type="button">取消</button><button className="button button-primary" disabled={!comment.trim()} onClick={() => onSave({ dishId: dish.id, rating, comment: comment.trim(), image })} type="button">发布点评 <Icon name="arrow" size={15} /></button></div></div></Modal>
 }
 
 const formDefaults = {
