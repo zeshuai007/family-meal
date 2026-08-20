@@ -452,11 +452,14 @@ function App() {
   }, [activeMenu, menuFilter, menuSearch])
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(store))
-    } catch {
-      setToast((currentToast) => currentToast || { message: '本地空间不足，已保留当前页面内容，请减少成品图数量', type: 'warning' })
-    }
+    const saveTimer = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(store))
+      } catch {
+        setToast((currentToast) => currentToast || { message: '本地空间不足，已保留当前页面内容，请减少成品图数量', type: 'warning' })
+      }
+    }, 120)
+    return () => window.clearTimeout(saveTimer)
   }, [store])
 
   useEffect(() => {
@@ -581,6 +584,15 @@ function App() {
     notify('演示数据已恢复')
   }
 
+  const weeklyDishCount = useMemo(() => {
+    const weekStart = new Date()
+    weekStart.setHours(0, 0, 0, 0)
+    weekStart.setDate(weekStart.getDate() - 6)
+    return store.orderHistory
+      .filter((record) => new Date(`${record.date}T12:00:00`) >= weekStart)
+      .reduce((total, record) => total + meals.filter((meal) => record.plan[meal]).length, 0)
+  }, [store.orderHistory])
+
   const navItems = [
     { id: 'home', label: '今日餐桌', icon: 'home' },
     { id: 'menu', label: '浏览菜单', icon: 'menu' },
@@ -600,7 +612,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar navItems={navItems} view={view} goTo={goTo} user={store.user} isAdmin={store.isAdmin} orderCount={meals.filter((meal) => todayPlan[meal]).length} />
+      <Sidebar navItems={navItems} view={view} goTo={goTo} user={store.user} isAdmin={store.isAdmin} orderCount={meals.filter((meal) => todayPlan[meal]).length} weeklyDishCount={weeklyDishCount} />
       <div className="main-column">
         <header className="topbar">
           <div className="mobile-brand">
@@ -750,7 +762,7 @@ function Avatar({ user, size = 'medium' }) {
   return <span className={`avatar avatar-${user.color || 'coral'} avatar-${size}`}>{user.initials || user.name?.slice(0, 1)}</span>
 }
 
-function Sidebar({ navItems, view, goTo, user, isAdmin, orderCount }) {
+function Sidebar({ navItems, view, goTo, user, isAdmin, orderCount, weeklyDishCount }) {
   return (
     <aside className="sidebar">
       <div className="brand-lockup">
@@ -788,7 +800,7 @@ function Sidebar({ navItems, view, goTo, user, isAdmin, orderCount }) {
         <div className="sidebar-tip">
           <span className="tip-icon"><Icon name="flame" size={17} /></span>
           <div>
-            <strong>本周已吃 12 道菜</strong>
+            <strong>本周已安排 {weeklyDishCount} 道菜</strong>
             <span>继续保持好胃口</span>
           </div>
         </div>
