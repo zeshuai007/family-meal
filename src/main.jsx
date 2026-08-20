@@ -405,6 +405,15 @@ function formatNow() {
   return new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).format(new Date())
 }
 
+function timeGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 5) return '夜深了'
+  if (hour < 11) return '早上好'
+  if (hour < 14) return '中午好'
+  if (hour < 18) return '下午好'
+  return '晚上好'
+}
+
 function averageRating(reviews) {
   if (!reviews.length) return '—'
   return (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
@@ -819,7 +828,7 @@ function Dashboard({ activeMenu, todayPlan, onConfirm, onChooseMeal, onOpenDish,
       <section className="welcome-row">
         <div>
           <p className="eyebrow">{formatNow()}</p>
-          <h1>早上好，{user.name} <span className="wave">👋</span></h1>
+          <h1>{timeGreeting()}，{user.name} <span className="wave">👋</span></h1>
           <p className="page-subtitle">今天也要好好吃饭，想吃什么就告诉婆婆吧。</p>
         </div>
         <button className="date-pill" onClick={() => onGoTo('orders')} type="button">
