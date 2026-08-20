@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Responsive family meal ordering app for a home kitchen",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
