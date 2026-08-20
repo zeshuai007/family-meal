@@ -477,8 +477,7 @@ function App() {
       }
     })
     setPickerMeal(null)
-    const dish = store.menu.find((item) => item.id === dishId)
-    notify(`${meal}已选「${dish?.name || '这道菜'}」`)
+    notify(`${meal}已选菜品，婆婆会按这个准备`)
   }
 
   const confirmPlan = () => {
@@ -586,7 +585,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar navItems={navItems} view={view} goTo={goTo} user={store.user} isAdmin={store.isAdmin} />
+      <Sidebar navItems={navItems} view={view} goTo={goTo} user={store.user} isAdmin={store.isAdmin} orderCount={meals.filter((meal) => todayPlan[meal]).length} />
       <div className="main-column">
         <header className="topbar">
           <div className="mobile-brand">
@@ -736,7 +735,7 @@ function Avatar({ user, size = 'medium' }) {
   return <span className={`avatar avatar-${user.color || 'coral'} avatar-${size}`}>{user.initials || user.name?.slice(0, 1)}</span>
 }
 
-function Sidebar({ navItems, view, goTo, user, isAdmin }) {
+function Sidebar({ navItems, view, goTo, user, isAdmin, orderCount }) {
   return (
     <aside className="sidebar">
       <div className="brand-lockup">
@@ -756,7 +755,7 @@ function Sidebar({ navItems, view, goTo, user, isAdmin }) {
           <button className={`nav-item ${view === item.id ? 'active' : ''} ${item.admin ? 'admin-nav' : ''}`} key={item.id} onClick={() => goTo(item.id)} type="button">
             <Icon name={item.icon} size={19} />
             <span>{item.label}</span>
-            {item.id === 'orders' && <span className="nav-count">3</span>}
+            {item.id === 'orders' && orderCount > 0 && <span className="nav-count">{orderCount}</span>}
             {item.admin && <span className="admin-dot">●</span>}
           </button>
         ))}
