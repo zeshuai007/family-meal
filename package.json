@@ -1,0 +1,18 @@
+{
+  "name": "family-meal",
+  "version": "1.0.0",
+  "description": "家庭点菜系统 - 家人通过手机/平板/电脑在线点菜、点评，婆婆做菜并上传成品",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx --yes serve -l 8080 .",
+    "dev": "npx --yes serve -l 8080 ."
+  },
+  "keywords": [
+    "家庭点餐",
+    "菜单管理",
+    "怀孕餐",
+    "移动端"
+  ],
+  "author": "family",
+  "license": "MIT"
+}

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#E9D8C3" />
+<title>家味 · 家庭点菜台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="28" height="28" fill="none">
+            <path d="M6 30c12-3 24-3 36 0" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M10 22c10-2 18-2 28 0" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>
+            <path d="M14 14c8-1.5 12-1.5 20 0" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".45"/>
+            <circle cx="24" cy="10" r="2" fill="#fff"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>家味 · Family Kitchen</h1>
+          <p id="greeting">给妈妈的每一餐，都要用心</p>
+        </div>
+      </div>
+      <div class="userbox">
+        <label class="who">
+          <span class="who-tip">我是</span>
+          <select id="currentUserSelect" aria-label="选择当前身份"></select>
+        </label>
+        <button id="btnOpenAuth" class="ghost-btn" title="管理员登录 / 授权">
+          <span class="lock-icon" aria-hidden="true">🔒</span>
+          <span id="authLabel">管理员登录</span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="主导航">
+      <button class="tab active" data-tab="today" role="tab" aria-selected="true">今日三餐</button>
+      <button class="tab" data-tab="menu" role="tab">菜单馆</button>
+      <button class="tab" data-tab="reviews" role="tab">味道墙</button>
+      <button class="tab admin-only" data-tab="admin" role="tab">管理台</button>
+      <button class="tab admin-only" data-tab="roles" role="tab">权限</button>
+    </nav>
+
+    <main class="content">
+      <!-- ============ 今日三餐 ============ -->
+      <section class="view view-today active" data-view="today">
+        <div class="date-row">
+          <button class="icon-btn" id="prevDay" aria-label="前一天">‹</button>
+          <div class="date-display">
+            <div class="date-big" id="orderDateLabel">—</div>
+            <div class="date-sub" id="orderDateSub">—</div>
+          </div>
+          <button class="icon-btn" id="nextDay" aria-label="后一天">›</button>
+          <button class="pill-btn" id="todayJump">回到今天</button>
+        </div>
+        <div class="meals-grid" id="mealsGrid"></div>
+      </section>
+
+      <!-- ============ 菜单馆 ============ -->
+      <section class="view view-menu" data-view="menu">
+        <div class="menu-head">
+          <div class="menu-search">
+            <input id="menuSearch" type="search" placeholder="搜菜名 / 食材 / 口味…" />
+            <div class="chip-row" id="tagChips"></div>
+          </div>
+          <div class="admin-only menu-actions">
+            <button id="btnNewDish" class="primary-btn">＋ 新增菜品</button>
+          </div>
+        </div>
+        <div class="dish-grid" id="dishGrid"></div>
+      </section>
+
+      <!-- ============ 味道墙 ============ -->
+      <section class="view view-reviews" data-view="reviews">
+        <div class="reviews-head">
+          <h2>味道墙 · 成品与点评</h2>
+          <p class="muted">婆婆端出的成品，家人的暖心点评</p>
+        </div>
+        <div class="review-board" id="reviewBoard"></div>
+      </section>
+
+      <!-- ============ 管理台 ============ -->
+      <section class="view view-admin" data-view="admin">
+        <div class="admin-head">
+          <h2>菜单管理</h2>
+          <button id="btnNewDishAdmin" class="primary-btn">＋ 新增菜品</button>
+        </div>
+        <div class="admin-tip muted">仅管理员可操作：上新、编辑、下架、更新菜品信息。</div>
+        <div class="admin-list" id="adminDishList"></div>
+      </section>
+
+      <!-- ============ 权限 ============ -->
+      <section class="view view-roles" data-view="roles">
+        <div class="admin-head">
+          <h2>家人与管理员权限</h2>
+        </div>
+        <div class="role-card">
+          <h3>添加家人</h3>
+          <div class="role-row">
+            <input id="newMemberName" placeholder="家人称呼，例如：老公、大宝" maxlength="12"/>
+            <button id="btnAddMember" class="primary-btn">加入</button>
+          </div>
+        </div>
+        <div class="role-card">
+          <h3>家人列表</h3>
+          <ul class="member-list" id="memberList"></ul>
+        </div>
+        <div class="role-card">
+          <h3>管理员授权</h3>
+          <p class="muted">勾选后该家人可操作：菜单管理、上架/下架、菜品编辑。</p>
+          <ul class="member-list auth-list" id="authList"></ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footbar muted">
+      家味 · 保留一份温热的味道 · 数据保存在本设备浏览器中
+    </footer>
+  </div>
+
+  <!-- 菜品详情弹窗 -->
+  <div class="modal" id="dishModal" aria-hidden="true">
+    <div class="modal-mask" data-close="dishModal"></div>
+    <div class="modal-panel modal-wide">
+      <button class="modal-x" data-close="dishModal" aria-label="关闭">×</button>
+      <div id="dishModalBody"></div>
+    </div>
+  </div>
+
+  <!-- 菜品编辑弹窗 -->
+  <div class="modal" id="editModal" aria-hidden="true">
+    <div class="modal-mask" data-close="editModal"></div>
+    <div class="modal-panel modal-tall">
+      <button class="modal-x" data-close="editModal" aria-label="关闭">×</button>
+      <div class="edit-head">
+        <h2 id="editTitle">新增菜品</h2>
+        <div class="edit-publish">
+          <label class="switch">
+            <input type="checkbox" id="fPublished" checked />
+            <span class="slider"></span>
+          </label>
+          <span>上架（家人可见）</span>
+        </div>
+      </div>
+      <form id="dishForm" class="form-grid">
+        <label class="form-item">
+          <span>菜名 <em>*</em></span>
+          <input type="text" id="fName" required maxlength="30" placeholder="例如：番茄炖牛腩"/>
+        </label>
+        <label class="form-item">
+          <span>口味标签（逗号分隔）</span>
+          <input type="text" id="fTags" maxlength="80" placeholder="开胃, 下饭, 微辣, 低钠"/>
+        </label>
+        <label class="form-item col-span-2">
+          <span>菜品图片 <em>*</em></span>
+          <div class="img-uploader">
+            <input type="file" id="fImage" accept="image/*" />
+            <div class="img-preview" id="imgPreview">
+              <div class="img-placeholder">点击左侧选择图片 · 或粘贴图片URL</div>
+            </div>
+            <input type="url" id="fImageUrl" placeholder="也可输入图片地址 https://…" />
+          </div>
+        </label>
+        <label class="form-item">
+          <span>主食材（换行一种）<em>*</em></span>
+          <textarea id="fMainIng" rows="4" placeholder="牛腩 500g&#10;番茄 3个"></textarea>
+        </label>
+        <label class="form-item">
+          <span>配菜（换行一种）</span>
+          <textarea id="fSideIng" rows="4" placeholder="胡萝卜 1根&#10;洋葱 半个"></textarea>
+        </label>
+        <label class="form-item col-span-2">
+          <span>配料 &amp; 调料</span>
+          <textarea id="fSeason" rows="3" placeholder="姜片 3片 / 生抽 2勺 / 冰糖 5粒 / 盐 适量"></textarea>
+        </label>
+        <label class="form-item col-span-2">
+          <span>详细做法（每行一个步骤，建议编号）<em>*</em></span>
+          <textarea id="fSteps" rows="10" placeholder="1. 牛腩冷水下锅焯水去腥…&#10;2. 番茄去皮切块，炒出红油…&#10;3. 倒入牛腩加开水炖煮…"></textarea>
+        </label>
+        <label class="form-item col-span-2">
+          <span>适合时段</span>
+          <div class="chip-row">
+            <label class="chk-chip"><input type="checkbox" value="breakfast" name="fMeal" /> 早餐</label>
+            <label class="chk-chip"><input type="checkbox" value="lunch" name="fMeal" checked /> 午餐</label>
+            <label class="chk-chip"><input type="checkbox" value="dinner" name="fMeal" checked /> 晚餐</label>
+          </div>
+        </label>
+        <div class="form-actions col-span-2">
+          <button type="button" class="ghost-btn" data-close="editModal">取消</button>
+          <button type="submit" class="primary-btn">保存菜品</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 点菜弹窗 -->
+  <div class="modal" id="orderModal" aria-hidden="true">
+    <div class="modal-mask" data-close="orderModal"></div>
+    <div class="modal-panel modal-wide">
+      <button class="modal-x" data-close="orderModal" aria-label="关闭">×</button>
+      <div id="orderModalBody"></div>
+    </div>
+  </div>
+
+  <!-- 点评弹窗 -->
+  <div class="modal" id="reviewModal" aria-hidden="true">
+    <div class="modal-mask" data-close="reviewModal"></div>
+    <div class="modal-panel">
+      <button class="modal-x" data-close="reviewModal" aria-label="关闭">×</button>
+      <div id="reviewModalBody"></div>
+    </div>
+  </div>
+
+  <!-- 管理员登录弹窗 -->
+  <div class="modal" id="authModal" aria-hidden="true">
+    <div class="modal-mask" data-close="authModal"></div>
+    <div class="modal-panel modal-small">
+      <button class="modal-x" data-close="authModal" aria-label="关闭">×</button>
+      <div class="auth-box">
+        <h2>管理员访问</h2>
+        <p class="muted">首次访问请设置管理密码；之后需要输入密码方可进入管理台。</p>
+        <label class="form-item">
+          <span>管理密码</span>
+          <input id="adminPwd" type="password" placeholder="请输入管理密码" autocomplete="current-password"/>
+        </label>
+        <label class="form-item" id="confirmBox" style="display:none">
+          <span>再输入一次</span>
+          <input id="adminPwd2" type="password" placeholder="确认密码"/>
+        </label>
+        <button class="primary-btn full" id="btnAuthGo">进入管理台</button>
+        <button class="ghost-btn full" id="btnAuthLogout" style="display:none;margin-top:8px">退出管理员</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
